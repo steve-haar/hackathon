@@ -8,7 +8,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { IPlayer, IGameState } from '../../../../models';
+import { IPlayer, IGameState, ICoin } from '../../../../models';
 
 const DEFAULT_COIN_COLOR = 'yellow';
 const DEFAULT_OTHER_PLAYER_COLOR = 'red';
@@ -72,7 +72,7 @@ export class FieldComponent implements AfterViewInit, OnChanges {
     this.canvas.height = this.canvas.clientHeight;
     this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
     this.drawBackground();
-    this.drawTokens();
+    this.drawCoins();
     this.drawOtherPlayers();
     this.drawPlayer();
   }
@@ -109,18 +109,19 @@ export class FieldComponent implements AfterViewInit, OnChanges {
     // player is always at the center of the screen
     const x = this.canvas.clientWidth / 2;
     const y = this.canvas.clientHeight / 2;
+    console.log('PLAYER', this.player);
 
     this.drawCircle(
       x,
       y,
       this.playerSize,
-      this.playerColor,
+      this.player?.power.type === 'invincible' && (this.state?.loopCount || 1) % 2 == 0 ? 'white' : this.playerColor,
       'black',
       this.player?.name ?? DEFAULT_PLAYER_NAME
     );
   }
 
-  drawTokens() {
+  drawCoins() {
     if (!this.canvas || !this.ctx || !this.state) {
       return;
     }
@@ -135,8 +136,9 @@ export class FieldComponent implements AfterViewInit, OnChanges {
     for (let coin of visibleCoins) {
       const x = coin.canvasCoord!.x;
       const y = coin.canvasCoord!.y;
+      const color = getCoinColor(coin.coin);
 
-      this.drawCircle(x, y, this.playerSize, DEFAULT_COIN_COLOR, 'gray');
+      this.drawCircle(x, y, this.playerSize, color, 'gray');
     }
   }
 
@@ -161,7 +163,7 @@ export class FieldComponent implements AfterViewInit, OnChanges {
         x,
         y,
         this.playerSize,
-        DEFAULT_OTHER_PLAYER_COLOR,
+        p.player.power.type === 'invincible' && (this.state?.loopCount || 1) % 2 == 0 ? 'white' : DEFAULT_OTHER_PLAYER_COLOR,
         'black',
         p.player.name
       );
@@ -213,5 +215,14 @@ export class FieldComponent implements AfterViewInit, OnChanges {
       const nameHeight = Number(/\d+/.exec(this.ctx.font));
       this.ctx.fillText(label, x, y - nameHeight - 0.2 * this.playerSize);
     }
+  }
+}
+
+function getCoinColor(coin: ICoin) {
+  switch (coin.type) {
+    case 'fast':
+      return 'green';
+    default:
+      return DEFAULT_COIN_COLOR;
   }
 }

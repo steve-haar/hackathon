@@ -1,9 +1,12 @@
-import { Commands, IGameState, IPlayer } from './models';
+import { CoinType, Commands, ICoin, IGameState, IPlayer } from './models';
+import { InvinciblePower } from './powers/invincible';
+import { DefaultPower } from './powers/default-power';
 
 const coinCount = 100;
 
 export function getInitialState(): IGameState {
   return {
+    loopCount: 0,
     players: [],
     coins: [],
     fieldSize: {
@@ -14,15 +17,18 @@ export function getInitialState(): IGameState {
   };
 }
 
-export function gameLogic(state: IGameState, commands: Commands): IGameState {
-  evaluateCommands(state, commands);
+export function gameLogic(state: IGameState, commands: Commands, loopCounter: number): IGameState {
+  state.loopCount++;
+
+  evaluateCommands(state, commands, loopCounter);
   resolveCoinCollisions(state);
   resolvePlayerCollisions(state);
   addMoreCoins(state);
+  degradePowers(state);
   return state;
 }
 
-function evaluateCommands(state: IGameState, commands: Commands) {
+function evaluateCommands(state: IGameState, commands: Commands, loopCounter: number) {
   Object.keys(commands).forEach((playerId) => {
     const player = state.players.find((p) => p.id === playerId);
     if (!player) {
@@ -61,10 +67,20 @@ function resolveCoinCollisions(state: IGameState) {
   state.coins.slice().forEach((coin) => {
     const player = state.players.find((p) => p.x === coin.x && p.y === coin.y);
     if (player) {
+      player.power = getCoinPower(coin) || player.power;
       player.score++;
       state.coins = state.coins.filter((c) => c !== coin);
     }
   });
+}
+
+function getCoinPower(coin: ICoin) {
+  switch (coin.type) {
+    case 'fast':
+      return new InvinciblePower();
+    default:
+      return null;
+  }
 }
 
 function resolvePlayerCollisions(state: IGameState) {
@@ -80,16 +96,32 @@ function resolvePlayerCollisions(state: IGameState) {
       const roll = Math.floor(Math.random() * pool);
       let winner: IPlayer;
       let loser: IPlayer;
-      if (roll === 1) {
+
+      const playerIsInvincible = player.power.getIsInvincible();
+      const otherPlayerIsInvincible = otherPlayer.power.getIsInvincible();
+
+      if (playerIsInvincible && otherPlayerIsInvincible) {
+        winner = null;
+        loser = null;
+      } else if (playerIsInvincible) {
+        winner = player;
+        loser = otherPlayer;
+      }  else if (otherPlayerIsInvincible) {
+        winner = otherPlayer;
+        loser = player;
+      } else if (roll === 1) {
         winner = player;
         loser = otherPlayer;
       } else {
         winner = otherPlayer;
         loser = player;
       }
-      winner.score += loser.score;
-      state.players = state.players.filter((p) => p !== loser);
-      state.eliminatedPlayers[loser.id] = winner.id;
+
+      if (winner && loser) {
+        winner.score += loser.score;
+        state.players = state.players.filter((p) => p !== loser);
+        state.eliminatedPlayers[loser.id] = winner.id;
+      }
     }
   });
 }
@@ -97,9 +129,22 @@ function resolvePlayerCollisions(state: IGameState) {
 function addMoreCoins(state: IGameState) {
   while (state.coins.length < coinCount) {
     const location = getUnoccupiedLocation(state);
-    const isDeadly = Math.floor(Math.random() * 2) === 1;
-    state.coins.push({ ...location, isDeadly });
+    const type = getCoinType();
+    state.coins.push({ ...location, type });
   }
+}
+
+function degradePowers(state: IGameState) {
+  state.players.forEach(player => {
+    player.power.remainingTime--;
+    if (player.power.remainingTime === 0) {
+      player.power = new DefaultPower();
+    }
+  });
+}
+
+function getCoinType(): CoinType {
+  return Math.random() < 0.1 ? 'fast' : 'normal';
 }
 
 export function getUnoccupiedLocation(state: IGameState): {

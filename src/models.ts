@@ -1,4 +1,7 @@
+import { DefaultPower } from "./powers/default-power";
+
 export interface IGameState {
+  loopCount: number;
   players: IPlayer[];
   coins: ICoin[];
   fieldSize: {
@@ -14,13 +17,16 @@ export interface IPlayer {
   score: number;
   x: number;
   y: number;
+  power: DefaultPower;
 }
 
 export interface ICoin {
   x: number;
   y: number;
-  isDeadly?: boolean;
+  type: CoinType
 }
 
+export type PowerType = 'default' | 'invincible';
+export type CoinType = 'normal' | 'fast';
 export type Command = 'left' | 'right' | 'up' | 'down';
 export type Commands = Record<string, Command>;

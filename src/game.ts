@@ -1,10 +1,11 @@
 import { gameLogic, getInitialState, getUnoccupiedLocation } from './logic';
 import { Command, Commands, IGameState } from './models';
+import { DefaultPower } from './powers/default-power';
 
 export type UpdateCallback = (gameState: IGameState) => void;
 export type GameOverCallback = (reason: string) => void;
 
-const UPDATES_PER_SECOND = 10;
+export const UPDATES_PER_SECOND = 10;
 
 export class Game {
   private _gameState: IGameState;
@@ -17,6 +18,7 @@ export class Game {
   > = {};
   private playerCommands: Commands = {};
   private timer?: NodeJS.Timer;
+  private loopCounter = 0;
 
   start() {
     console.log(`starting game (${UPDATES_PER_SECOND} updates per second)`);
@@ -50,6 +52,7 @@ export class Game {
       id,
       name,
       score: 1,
+      power: new DefaultPower()
     });
   }
 
@@ -72,7 +75,7 @@ export class Game {
 
   updateGameState() {
     const oldState = JSON.stringify(this._gameState);
-    const newState = gameLogic(this._gameState, this.playerCommands);
+    const newState = gameLogic(this._gameState, this.playerCommands, ++this.loopCounter);
     if (JSON.stringify(newState) === oldState) {
       return;
     }
