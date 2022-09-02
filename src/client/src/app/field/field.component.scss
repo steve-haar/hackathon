@@ -2,4 +2,8 @@
 
 canvas {
   @include fullScreen();
+
+  &.dark-mode {
+    background-color: #121212;
+  }
 }

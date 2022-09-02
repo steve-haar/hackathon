@@ -2,6 +2,7 @@ import { DefaultPower } from "./powers/default-power";
 
 export interface IGameState {
   loopCount: number;
+  darkMode: boolean;
   players: IPlayer[];
   coins: ICoin[];
   fieldSize: {
