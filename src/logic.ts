@@ -1,6 +1,7 @@
 import { CoinType, Commands, ICoin, IGameState, IPlayer } from './models';
 import { InvinciblePower } from './powers/invincible';
 import { DefaultPower } from './powers/default-power';
+import { FrozenPower } from './powers/frozen';
 
 const coinCount = 100;
 
@@ -23,15 +24,15 @@ export function gameLogic(state: IGameState, commands: Commands, loopCounter: nu
   evaluateCommands(state, commands, loopCounter);
   resolveCoinCollisions(state);
   resolvePlayerCollisions(state);
+  updatePowers(state);
   addMoreCoins(state);
-  degradePowers(state);
   return state;
 }
 
 function evaluateCommands(state: IGameState, commands: Commands, loopCounter: number) {
   Object.keys(commands).forEach((playerId) => {
     const player = state.players.find((p) => p.id === playerId);
-    if (!player) {
+    if (!player?.power.getCanMove()) {
       return;
     }
     const command = commands[playerId];
@@ -70,14 +71,33 @@ function resolveCoinCollisions(state: IGameState) {
       player.power = getCoinPower(coin) || player.power;
       player.score++;
       state.coins = state.coins.filter((c) => c !== coin);
+
+      const otherPlayerPowerFn = getOtherPlayerCoinPowerFn(coin);
+
+      if (otherPlayerPowerFn) {
+        state.players.forEach(otherPlayer => {
+          if (otherPlayer.id !== player.id) {
+            otherPlayer.power = otherPlayerPowerFn();
+          }
+        });
+      }
     }
   });
 }
 
 function getCoinPower(coin: ICoin) {
   switch (coin.type) {
-    case 'fast':
+    case 'invincible':
       return new InvinciblePower();
+    default:
+      return null;
+  }
+}
+
+function getOtherPlayerCoinPowerFn(coin: ICoin) {
+  switch (coin.type) {
+    case 'elsa':
+      return () => new FrozenPower();
     default:
       return null;
   }
@@ -129,12 +149,12 @@ function resolvePlayerCollisions(state: IGameState) {
 function addMoreCoins(state: IGameState) {
   while (state.coins.length < coinCount) {
     const location = getUnoccupiedLocation(state);
-    const type = getCoinType();
+    const type = getCoinType(state);
     state.coins.push({ ...location, type });
   }
 }
 
-function degradePowers(state: IGameState) {
+function updatePowers(state: IGameState) {
   state.players.forEach(player => {
     player.power.remainingTime--;
     if (player.power.remainingTime === 0) {
@@ -143,8 +163,14 @@ function degradePowers(state: IGameState) {
   });
 }
 
-function getCoinType(): CoinType {
-  return Math.random() < 0.1 ? 'fast' : 'normal';
+function getCoinType(state: IGameState): CoinType {
+  if (!state.coins.find(coin => coin.type === 'invincible') && !state.players.find(player => player.power.type === 'invincible')) {
+    return 'invincible';
+  } else if (!state.coins.find(coin => coin.type === 'elsa') && !state.players.find(player => player.power.type === 'frozen')) {
+    return 'elsa';
+  } else {
+    return 'normal';
+  }
 }
 
 export function getUnoccupiedLocation(state: IGameState): {

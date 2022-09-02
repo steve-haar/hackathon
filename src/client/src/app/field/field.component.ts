@@ -109,13 +109,20 @@ export class FieldComponent implements AfterViewInit, OnChanges {
     // player is always at the center of the screen
     const x = this.canvas.clientWidth / 2;
     const y = this.canvas.clientHeight / 2;
-    console.log('PLAYER', this.player);
+    
+    let playerColor = this.playerColor;
+
+    if (this.player?.power.type === 'frozen') {
+      playerColor = 'gray';
+    } else if (this.player?.power.type === 'invincible' && (this.state?.loopCount || 1) % 2 == 0) {
+      playerColor = 'white';
+    }
 
     this.drawCircle(
       x,
       y,
       this.playerSize,
-      this.player?.power.type === 'invincible' && (this.state?.loopCount || 1) % 2 == 0 ? 'white' : this.playerColor,
+      playerColor,
       'black',
       this.player?.name ?? DEFAULT_PLAYER_NAME
     );
@@ -159,11 +166,19 @@ export class FieldComponent implements AfterViewInit, OnChanges {
       const x = p.canvasCoord!.x;
       const y = p.canvasCoord!.y;
 
+      let playerColor = DEFAULT_OTHER_PLAYER_COLOR;
+
+      if (p.player.power.type === 'frozen') {
+        playerColor = 'gray';
+      } else if (p.player.power.type === 'invincible' && (this.state?.loopCount || 1) % 2 == 0) {
+        playerColor = 'white';
+      }
+
       this.drawCircle(
         x,
         y,
         this.playerSize,
-        p.player.power.type === 'invincible' && (this.state?.loopCount || 1) % 2 == 0 ? 'white' : DEFAULT_OTHER_PLAYER_COLOR,
+        playerColor,
         'black',
         p.player.name
       );
@@ -220,8 +235,10 @@ export class FieldComponent implements AfterViewInit, OnChanges {
 
 function getCoinColor(coin: ICoin) {
   switch (coin.type) {
-    case 'fast':
+    case 'invincible':
       return 'green';
+    case 'elsa':
+      return 'aqua';
     default:
       return DEFAULT_COIN_COLOR;
   }
