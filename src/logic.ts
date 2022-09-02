@@ -69,7 +69,7 @@ function resolveCoinCollisions(state: IGameState) {
     const player = state.players.find((p) => p.x === coin.x && p.y === coin.y);
     if (player) {
       player.power = getCoinPower(coin) || player.power;
-      player.score++;
+      player.score = coin.type === 'poison' ? 0 : player.score + 1;
       state.coins = state.coins.filter((c) => c !== coin);
 
       const otherPlayerPowerFn = getOtherPlayerCoinPowerFn(coin);
@@ -168,6 +168,8 @@ function getCoinType(state: IGameState): CoinType {
     return 'invincible';
   } else if (!state.coins.find(coin => coin.type === 'elsa') && !state.players.find(player => player.power.type === 'frozen')) {
     return 'elsa';
+  } else if (!state.coins.find(coin => coin.type === 'poison')) {
+    return 'poison';
   } else {
     return 'normal';
   }

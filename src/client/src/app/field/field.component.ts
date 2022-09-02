@@ -239,6 +239,8 @@ function getCoinColor(coin: ICoin) {
       return 'green';
     case 'elsa':
       return 'aqua';
+    case 'poison':
+      return 'black';
     default:
       return DEFAULT_COIN_COLOR;
   }
