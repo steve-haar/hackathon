@@ -13,6 +13,8 @@ export class LeaderboardComponent implements OnInit {
   @Input()
   player?: IPlayer;
 
+  readonly Math = Math;
+
   constructor() {}
 
   ngOnInit(): void {}

@@ -4,7 +4,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
 }
 
 app-new-game-dialog {
@@ -13,8 +12,6 @@ app-new-game-dialog {
 }
 
 app-leaderboard {
-  position: absolute;
   top: 20px;
   right: 20px;
-  z-index: $zIndexOverlay;
 }

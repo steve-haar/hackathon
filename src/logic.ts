@@ -2,8 +2,10 @@ import { CoinType, Commands, ICoin, IGameState, IPlayer } from './models';
 import { InvinciblePower } from './powers/invincible';
 import { DefaultPower } from './powers/default-power';
 import { FrozenPower } from './powers/frozen';
+import { UPDATES_PER_SECOND } from './game';
 
 const coinCount = 100;
+const gameLength = 180;
 
 export function getInitialState(): IGameState {
   return {
@@ -16,6 +18,7 @@ export function getInitialState(): IGameState {
       height: 100,
     },
     eliminatedPlayers: {},
+    maxLoopCount: gameLength * UPDATES_PER_SECOND
   };
 }
 

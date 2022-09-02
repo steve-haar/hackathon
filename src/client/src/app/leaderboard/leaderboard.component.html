@@ -5,6 +5,7 @@
   </div>
   <hr>
   <ng-container *ngIf="state">
+    <div>{{Math.round((state.maxLoopCount - state.loopCount) / 10)}} seconds</div>
     <div
       *ngFor="let playa of state.players | sort: 'score':true"
       [class.player]="player?.id === playa.id"

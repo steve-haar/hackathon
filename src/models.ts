@@ -10,6 +10,7 @@ export interface IGameState {
     height: number;
   };
   eliminatedPlayers: Record<string, string>;
+  maxLoopCount: number;
 }
 
 export interface IPlayer {

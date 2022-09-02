@@ -96,5 +96,9 @@ export class Game {
         callbacks.gameOver(message);
       }
     });
+
+    if (newState.loopCount >= newState.maxLoopCount) {
+      clearTimeout(this.timer);
+    }
   }
 }
