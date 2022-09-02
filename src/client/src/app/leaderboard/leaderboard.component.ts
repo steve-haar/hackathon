@@ -17,5 +17,5 @@ export class LeaderboardComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  coinTypes = [{ type: 'invincible', color: 'green'}, { type: 'elsa', color: 'aqua' }, { type: 'poison', color: 'black' }];
+  coinTypes = [{ type: 'invincible', color: 'green'}, { type: 'elsa', color: 'aqua' }, { type: 'poison', color: 'black' }, { type: '20 points', color: '#a17f1a' }];
 }

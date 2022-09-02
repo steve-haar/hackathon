@@ -241,6 +241,8 @@ function getCoinColor(coin: ICoin) {
       return 'aqua';
     case 'poison':
       return 'black';
+    case 'bonus':
+      return '#a17f1a';
     default:
       return DEFAULT_COIN_COLOR;
   }

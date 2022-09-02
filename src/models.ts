@@ -27,6 +27,6 @@ export interface ICoin {
 }
 
 export type PowerType = 'default' | 'invincible' | 'frozen';
-export type CoinType = 'normal' | 'invincible' | 'elsa' | 'poison';
+export type CoinType = 'normal' | 'invincible' | 'elsa' | 'poison' | 'bonus';
 export type Command = 'left' | 'right' | 'up' | 'down';
 export type Commands = Record<string, Command>;

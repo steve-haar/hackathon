@@ -69,7 +69,18 @@ function resolveCoinCollisions(state: IGameState) {
     const player = state.players.find((p) => p.x === coin.x && p.y === coin.y);
     if (player) {
       player.power = getCoinPower(coin) || player.power;
-      player.score = coin.type === 'poison' ? 0 : player.score + 1;
+      
+      switch (coin.type) {
+        case 'poison':
+          player.score = 0;
+          break;
+        case 'bonus':
+          player.score += 20;
+          break;
+        default:
+          player.score++;
+      }
+      
       state.coins = state.coins.filter((c) => c !== coin);
 
       const otherPlayerPowerFn = getOtherPlayerCoinPowerFn(coin);
@@ -170,6 +181,8 @@ function getCoinType(state: IGameState): CoinType {
     return 'elsa';
   } else if (!state.coins.find(coin => coin.type === 'poison')) {
     return 'poison';
+  } else if (!state.coins.find(coin => coin.type === 'bonus')) {
+    return 'bonus';
   } else {
     return 'normal';
   }
