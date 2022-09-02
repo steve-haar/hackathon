@@ -28,6 +28,6 @@ export interface ICoin {
 }
 
 export type PowerType = 'default' | 'invincible' | 'frozen';
-export type CoinType = 'normal' | 'invincible' | 'elsa' | 'poison' | 'bonus';
+export type CoinType = 'normal' | 'invincible' | 'elsa' | 'poison' | 'bonus' | 'dark';
 export type Command = 'left' | 'right' | 'up' | 'down';
 export type Commands = Record<string, Command>;

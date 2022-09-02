@@ -8,6 +8,7 @@ const coinCount = 100;
 export function getInitialState(): IGameState {
   return {
     loopCount: 0,
+    darkMode: false,
     players: [],
     coins: [],
     fieldSize: {
@@ -70,6 +71,10 @@ function resolveCoinCollisions(state: IGameState) {
     if (player) {
       player.power = getCoinPower(coin) || player.power;
       
+      if (coin.type === 'dark') {
+        state.darkMode = !state.darkMode;
+      }
+
       switch (coin.type) {
         case 'poison':
           player.score = 0;
@@ -80,7 +85,7 @@ function resolveCoinCollisions(state: IGameState) {
         default:
           player.score++;
       }
-      
+
       state.coins = state.coins.filter((c) => c !== coin);
 
       const otherPlayerPowerFn = getOtherPlayerCoinPowerFn(coin);
@@ -183,6 +188,8 @@ function getCoinType(state: IGameState): CoinType {
     return 'poison';
   } else if (!state.coins.find(coin => coin.type === 'bonus')) {
     return 'bonus';
+  } else if (!state.coins.find(coin => coin.type === 'dark')) {
+    return 'dark';
   } else {
     return 'normal';
   }

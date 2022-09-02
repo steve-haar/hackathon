@@ -143,7 +143,7 @@ export class FieldComponent implements AfterViewInit, OnChanges {
     for (let coin of visibleCoins) {
       const x = coin.canvasCoord!.x;
       const y = coin.canvasCoord!.y;
-      const color = getCoinColor(coin.coin);
+      const color = getCoinColor(coin.coin, this.state);
 
       this.drawCircle(x, y, this.playerSize, color, 'gray');
     }
@@ -233,16 +233,18 @@ export class FieldComponent implements AfterViewInit, OnChanges {
   }
 }
 
-function getCoinColor(coin: ICoin) {
+function getCoinColor(coin: ICoin, { darkMode }: IGameState) {
   switch (coin.type) {
     case 'invincible':
       return 'green';
     case 'elsa':
       return 'aqua';
     case 'poison':
-      return 'black';
+      return 'purple';
     case 'bonus':
       return '#a17f1a';
+    case 'dark':
+      return darkMode ? 'white' : 'black';
     default:
       return DEFAULT_COIN_COLOR;
   }
