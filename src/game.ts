@@ -83,6 +83,11 @@ export class Game {
     this.playerCommands = {};
     Object.keys(this.callbacks).forEach((id) => {
       const callbacks = this.callbacks[id];
+
+      if (newState.loopCount >= newState.maxLoopCount) {
+        callbacks.gameOver('Time up');
+      }
+      
       callbacks.update(newState);
       const player = this._gameState.players.find((p) => p.id === id);
       if (!player) {
