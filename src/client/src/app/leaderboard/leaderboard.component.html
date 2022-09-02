@@ -1,4 +1,9 @@
 <div class="leaderboard">
+  <div *ngFor="let coin of coinTypes" style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="padding-right: 4px;">{{coin.type}}</div>
+    <div [style.backgroundColor]="coin.color" style="border-radius: 50%; width: 10px; height: 10px; border: 1px solid gray;"></div>
+  </div>
+  <hr>
   <ng-container *ngIf="state">
     <div
       *ngFor="let playa of state.players | sort: 'score':true"
